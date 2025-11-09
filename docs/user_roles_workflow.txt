@@ -1,0 +1,98 @@
+SRMS USER ROLES WORKFLOW
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                LOGIN FLOW                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                              ┌──────────┐
+                              │   USER   │
+                              │  LOGIN   │
+                              └──────────┘
+                                    │
+                              ┌──────────┐
+                              │AUTH SYSTEM│
+                              │(JWT Token)│
+                              └──────────┘
+                                    │
+                              ┌──────────┐
+                              │  ROLE    │
+                              │IDENTIFICATION│
+                              └──────────┘
+                                    │
+        ┌───────────────────────────┼────────────────────────────┐
+        │                           │                            │
+        ▼                           ▼                            ▼
+┌───────────────┐         ┌───────────────┐          ┌──────────────────┐
+│SUPER ADMIN    │         │DISTRICT ADMIN │          │SCHOOL ADMIN      │
+│(Full Access)  │         │(District Level)│          │(School Level)    │
+└───────────────┘         └───────────────┘          └──────────────────┘
+        │                           │                            │
+        ▼                           ▼                            ▼
+┌───────────────┐         ┌───────────────┐          ┌──────────────────┐
+│- All Districts│         │- Own District │          │- Own School Only │
+│- All Schools  │         │- All Schools  │          │- Student Mgmt    │
+│- User Mgmt    │         │- User Mgmt    │          │- Teacher Mgmt    │
+│- System Config│         │- Reports      │          │- Reports         │
+└───────────────┘         └───────────────┘          └──────────────────┘
+        │                           │                            │
+        ▼                           ▼                            ▼
+┌───────────────┐         ┌───────────────┐          ┌──────────────────┐
+│TEACHER        │         │STUDENT        │          │PARENT            │
+│(Class Level)  │         │(Self Access)  │          │(Child Access)    │
+└───────────────┘         └───────────────┘          └──────────────────┘
+        │                           │                            │
+┌───────────────┐         ┌───────────────┐          ┌──────────────────┐
+│- Enter Marks  │         │- View Own     │          │- View Child      │
+│- View Students│         │  Results      │          │  Results         │
+│- Generate     │         │- View Reports │          │- View Reports    │
+│  Reports      │         │- Download     │          │- Download        │
+│- Class Mgmt   │         │  Certificates │          │  Certificates    │
+└───────────────┘         │- View        │          │- Communicate     │
+        │                 │  Announcements│          │  with Teachers   │
+        │                 └───────────────┘          └──────────────────┘
+        │                           │                            │
+        └───────────────────────────┼────────────────────────────┘
+                                    │
+                              ┌──────────┐
+                              │DATABASE  │
+                              │(PostgreSQL)│
+                              └──────────┘
+                                    │
+                              ┌──────────┐
+                              │  REPORTS │
+                              │GENERATION│
+                              └──────────┘
+                                    │
+                              ┌──────────┐
+                              │NOTIFICATION│
+                              │SYSTEM      │
+                              └──────────┘
+                                    │
+                        ┌───────────┼───────────┐
+                        │           │           │
+                  ┌──────────┐ ┌──────────┐ ┌──────────┐
+                  │  EMAIL   │ │   SMS    │ │  IN-APP  │
+                  │NOTIFICATIONS│NOTIFICATIONS│NOTIFICATIONS│
+                  └──────────┘ └──────────┘ └──────────┘
+
+
+PERMISSIONS HIERARCHY:
+
+SUPER ADMIN
+    │
+    ▼
+DISTRICT ADMIN
+    │
+    ▼
+SCHOOL ADMIN
+    │
+    ▼
+TEACHER
+    │
+    ▼
+STUDENT
+    │
+    ▼
+PARENT
+
+Each role inherits permissions from the level above and has additional role-specific permissions.

@@ -1,0 +1,562 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model audit_logs {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  action    String
+  entity    String
+  entityId  Int?
+  oldValues Json?
+  newValues Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([createdAt])
+  @@index([entity])
+  @@index([userId])
+}
+
+model bills {
+  id          Int           @id @default(autoincrement())
+  billNo      String        @unique
+  totalAmount Float
+  paidAmount  Float         @default(0)
+  balance     Float
+  currency    String        @default("NPR")
+  dueDate     DateTime?
+  status      PaymentStatus @default(PENDING)
+  description String?
+  billData    Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime
+  studentId   Int
+  examFeeId   Int?
+  exam_fees   exam_fees?    @relation(fields: [examFeeId], references: [id])
+  students    students      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  payments    payments[]
+
+  @@index([billNo])
+  @@index([status])
+  @@index([studentId])
+}
+
+model certificate_bills {
+  id                   Int                    @id @default(autoincrement())
+  billNo               String                 @unique
+  totalAmount          Float
+  paidAmount           Float                  @default(0)
+  balance              Float
+  currency             String                 @default("NPR")
+  quantity             Int                    @default(1)
+  unitPrice            Float
+  dueDate              DateTime?
+  status               PaymentStatus          @default(PENDING)
+  description          String?
+  billData             Json?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  studentId            Int
+  certificateId        Int?
+  certificateFeeId     Int?
+  certificate_fees     certificate_fees?      @relation(fields: [certificateFeeId], references: [id])
+  certificates         certificates?          @relation(fields: [certificateId], references: [id])
+  students             students               @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  certificate_payments certificate_payments[]
+
+  @@index([billNo])
+  @@index([status])
+  @@index([studentId])
+}
+
+model certificate_fees {
+  id                Int                 @id @default(autoincrement())
+  amount            Float
+  currency          String              @default("NPR")
+  quantity          Int                 @default(1)
+  totalAmount       Float
+  status            PaymentStatus       @default(PENDING)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime
+  studentId         Int
+  feeStructureId    Int
+  certificate_bills certificate_bills[]
+  fee_structures    fee_structures      @relation(fields: [feeStructureId], references: [id])
+  students          students            @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([studentId])
+}
+
+model certificate_payments {
+  id                Int               @id @default(autoincrement())
+  paymentId         String            @unique
+  amount            Float
+  currency          String            @default("NPR")
+  method            PaymentMethod
+  status            PaymentStatus     @default(PENDING)
+  transactionId     String?
+  gatewayRef        String?
+  remarks           String?
+  paidAt            DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime
+  certificateBillId Int
+  processedById     Int?
+  certificate_bills certificate_bills @relation(fields: [certificateBillId], references: [id], onDelete: Cascade)
+  users             users?            @relation(fields: [processedById], references: [id])
+
+  @@index([method])
+  @@index([paidAt])
+  @@index([status])
+}
+
+model certificate_templates {
+  id           Int             @id @default(autoincrement())
+  name         String
+  type         CertificateType
+  template     Json
+  isActive     Boolean         @default(true)
+  isDefault    Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime
+  createdById  Int?
+  users        users?          @relation(fields: [createdById], references: [id])
+  certificates certificates[]
+
+  @@index([type])
+}
+
+model certificates {
+  id                    Int                    @id @default(autoincrement())
+  certificateNo         String                 @unique
+  type                  CertificateType
+  title                 String
+  description           String?
+  issueDate             DateTime               @default(now())
+  validUntil            DateTime?
+  verificationCode      String                 @unique
+  status                CertificateStatus      @default(PENDING)
+  templateData          Json?
+  pdfPath               String?
+  downloadCount         Int                    @default(0)
+  lastDownloaded        DateTime?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime
+  studentId             Int
+  examResultId          Int?
+  templateId            Int?
+  issuedById            Int?
+  certificate_bills     certificate_bills[]
+  exam_results          exam_results?          @relation(fields: [examResultId], references: [id])
+  users                 users?                 @relation(fields: [issuedById], references: [id])
+  students              students               @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  certificate_templates certificate_templates? @relation(fields: [templateId], references: [id])
+
+  @@index([status])
+  @@index([studentId])
+  @@index([type])
+  @@index([verificationCode])
+}
+
+model exam_fees {
+  id             Int            @id @default(autoincrement())
+  amount         Float
+  currency       String         @default("NPR")
+  dueDate        DateTime?
+  status         PaymentStatus  @default(PENDING)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime
+  examId         Int
+  studentId      Int
+  feeStructureId Int
+  bills          bills[]
+  exams          exams          @relation(fields: [examId], references: [id], onDelete: Cascade)
+  fee_structures fee_structures @relation(fields: [feeStructureId], references: [id])
+  students       students       @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, studentId])
+  @@index([status])
+}
+
+model exam_results {
+  id                   Int                    @id @default(autoincrement())
+  status               ExamResultStatus       @default(PENDING)
+  totalMarks           Float?
+  obtainedMarks        Float?
+  percentage           Float?
+  grade                String?
+  gradePoints          Float?
+  rank                 Int?
+  remarks              String?
+  isPublished          Boolean                @default(false)
+  publishedAt          DateTime?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  examId               Int
+  studentId            Int
+  certificates         certificates[]
+  exams                exams                  @relation(fields: [examId], references: [id], onDelete: Cascade)
+  students             students               @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  exam_subject_results exam_subject_results[]
+
+  @@unique([examId, studentId])
+  @@index([isPublished])
+  @@index([status])
+}
+
+model exam_subject_results {
+  id           Int          @id @default(autoincrement())
+  marks        Float
+  maxMarks     Float        @default(100)
+  grade        String?
+  gradePoints  Float?
+  isAbsent     Boolean      @default(false)
+  remarks      String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime
+  examResultId Int
+  subjectId    Int
+  exam_results exam_results @relation(fields: [examResultId], references: [id], onDelete: Cascade)
+  subjects     subjects     @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([examResultId, subjectId])
+}
+
+model exam_subjects {
+  id           Int       @id @default(autoincrement())
+  maxMarks     Float     @default(100)
+  minMarks     Float     @default(0)
+  examDate     DateTime?
+  duration     Int?
+  instructions String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime
+  examId       Int
+  subjectId    Int
+  exams        exams     @relation(fields: [examId], references: [id], onDelete: Cascade)
+  subjects     subjects  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([examId, subjectId])
+}
+
+model exams {
+  id            Int             @id @default(autoincrement())
+  name          String
+  code          String          @unique
+  description   String?
+  examType      ExamType        @default(FINAL)
+  startDate     DateTime
+  endDate       DateTime
+  isActive      Boolean         @default(true)
+  isPublished   Boolean         @default(false)
+  publishedAt   DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime
+  schoolId      Int?
+  createdById   Int?
+  exam_fees     exam_fees[]
+  exam_results  exam_results[]
+  exam_subjects exam_subjects[]
+  users         users?          @relation(fields: [createdById], references: [id])
+  schools       schools?        @relation(fields: [schoolId], references: [id])
+
+  @@index([examType])
+  @@index([schoolId])
+  @@index([startDate, endDate])
+}
+
+model fee_structures {
+  id               Int                @id @default(autoincrement())
+  name             String
+  type             FeeType
+  amount           Float
+  currency         String             @default("NPR")
+  description      String?
+  isActive         Boolean            @default(true)
+  validFrom        DateTime
+  validUntil       DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime
+  schoolId         Int?
+  createdById      Int?
+  certificate_fees certificate_fees[]
+  exam_fees        exam_fees[]
+  users            users?             @relation(fields: [createdById], references: [id])
+  schools          schools?           @relation(fields: [schoolId], references: [id])
+
+  @@index([schoolId])
+  @@index([type])
+}
+
+model marks {
+  id          Int       @id @default(autoincrement())
+  marks       Float
+  grade       String?
+  gradePoints Float?
+  maxMarks    Float     @default(100)
+  minMarks    Float     @default(0)
+  examType    ExamType  @default(FINAL)
+  examDate    DateTime?
+  remarks     String?
+  isPublished Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime
+  studentId   Int
+  subjectId   Int
+  students    students  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  subjects    subjects  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, subjectId, examType])
+  @@index([examType])
+  @@index([isPublished])
+  @@index([studentId])
+  @@index([subjectId])
+}
+
+model notifications {
+  id        Int              @id @default(autoincrement())
+  title     String
+  message   String
+  type      NotificationType @default(INFO)
+  targetId  Int?
+  isRead    Boolean          @default(false)
+  userId    Int?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime
+
+  @@index([isRead])
+  @@index([type])
+  @@index([userId])
+}
+
+model payments {
+  id            Int           @id @default(autoincrement())
+  paymentId     String        @unique
+  amount        Float
+  currency      String        @default("NPR")
+  method        PaymentMethod
+  status        PaymentStatus @default(PENDING)
+  transactionId String?
+  gatewayRef    String?
+  remarks       String?
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime
+  billId        Int
+  processedById Int?
+  bills         bills         @relation(fields: [billId], references: [id], onDelete: Cascade)
+  users         users?        @relation(fields: [processedById], references: [id])
+
+  @@index([method])
+  @@index([paidAt])
+  @@index([status])
+}
+
+model schools {
+  id             Int              @id @default(autoincrement())
+  name           String
+  code           String           @unique
+  address        String
+  phone          String?
+  email          String?
+  principal      String?
+  established    DateTime?
+  isActive       Boolean          @default(true)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime
+  createdById    Int?
+  exams          exams[]
+  fee_structures fee_structures[]
+  users          users?           @relation(fields: [createdById], references: [id])
+  students       students[]
+
+  @@index([code])
+  @@index([name])
+}
+
+model students {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  rollNo            String
+  class             String
+  section           String
+  dateOfBirth       DateTime?
+  gender            Gender?
+  address           String?
+  phone             String?
+  email             String?
+  parentName        String?
+  parentPhone       String?
+  parentEmail       String?
+  isActive          Boolean             @default(true)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime
+  schoolId          Int
+  createdById       Int?
+  bills             bills[]
+  certificate_bills certificate_bills[]
+  certificate_fees  certificate_fees[]
+  certificates      certificates[]
+  exam_fees         exam_fees[]
+  exam_results      exam_results[]
+  marks             marks[]
+  users             users?              @relation(fields: [createdById], references: [id])
+  schools           schools             @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([rollNo, class, section, schoolId])
+  @@index([class, section])
+  @@index([rollNo])
+  @@index([schoolId])
+}
+
+model subjects {
+  id                   Int                    @id @default(autoincrement())
+  name                 String
+  code                 String                 @unique
+  description          String?
+  credits              Int?                   @default(1)
+  isActive             Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime
+  exam_subject_results exam_subject_results[]
+  exam_subjects        exam_subjects[]
+  marks                marks[]
+
+  @@index([code])
+  @@index([name])
+}
+
+model system_settings {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique
+  value       String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime
+
+  @@index([key])
+}
+
+model users {
+  id                    Int                     @id @default(autoincrement())
+  email                 String                  @unique
+  password              String
+  role                  Role                    @default(STUDENT)
+  name                  String
+  phone                 String?
+  address               String?
+  isActive              Boolean                 @default(true)
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime @updatedAt
+  certificate_payments  certificate_payments[]
+  certificate_templates certificate_templates[]
+  certificates          certificates[]
+  exams                 exams[]
+  fee_structures        fee_structures[]
+  payments              payments[]
+  schools               schools[]
+  students              students[]
+
+  @@index([email])
+  @@index([role])
+}
+
+enum CertificateStatus {
+  PENDING
+  PROCESSING
+  READY
+  ISSUED
+  DELIVERED
+  CANCELLED
+}
+
+enum CertificateType {
+  MARKSHEET
+  TRANSCRIPT
+  PASSING_CERTIFICATE
+  MIGRATION_CERTIFICATE
+  CHARACTER_CERTIFICATE
+  COMPLETION_CERTIFICATE
+  ACHIEVEMENT_CERTIFICATE
+  PARTICIPATION_CERTIFICATE
+  CUSTOM
+}
+
+enum ExamResultStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  PUBLISHED
+  CANCELLED
+}
+
+enum ExamType {
+  UNIT_TEST
+  MIDTERM
+  FINAL
+  PRACTICAL
+  PROJECT
+  ASSIGNMENT
+}
+
+enum FeeType {
+  EXAM_FEE
+  CERTIFICATE_FEE
+  PROCESSING_FEE
+  LATE_FEE
+  REISSUE_FEE
+  VERIFICATION_FEE
+  CUSTOM
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  ERROR
+  SUCCESS
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  ONLINE_PAYMENT
+  CARD
+  MOBILE_WALLET
+  CHEQUE
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+  REFUNDED
+  PARTIALLY_PAID
+}
+
+enum Role {
+  SUPER_ADMIN
+  DISTRICT_ADMIN
+  SCHOOL_ADMIN
+  TEACHER
+  STUDENT
+  PARENT
+}

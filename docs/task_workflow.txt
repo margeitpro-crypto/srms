@@ -1,0 +1,128 @@
+SRMS COMPLETE TASK WORKFLOW
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           MAIN WORKFLOW                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                    ┌────────────────────┐
+                    │     USER LOGIN     │
+                    └────────────────────┘
+                              │
+                    ┌────────────────────┐
+                    │  AUTHENTICATION    │
+                    │   (JWT TOKEN)      │
+                    └────────────────────┘
+                              │
+                    ┌────────────────────┐
+                    │  ROLE IDENTIFICATION│
+                    └────────────────────┘
+                              │
+        ┌─────────────────────┼─────────────────────┐
+        │                     │                     │
+        ▼                     ▼                     ▼
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│SUPER ADMIN  │      │TEACHER      │      │STUDENT/PARENT│
+└─────────────┘      └─────────────┘      └─────────────┘
+        │                     │                     │
+        ▼                     ▼                     ▼
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│DASHBOARD    │      │DASHBOARD    │      │DASHBOARD    │
+│- System     │      │- Class      │      │- Personal   │
+│  Overview   │      │  Overview   │      │  Overview   │
+│- Analytics  │      │- Schedule   │      │- Results    │
+└─────────────┘      └─────────────┘      └─────────────┘
+        │                     │                     │
+        ▼                     ▼                     ▼
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│USER MGMT    │      │STUDENT MGMT │      │VIEW RESULTS │
+│- Create     │      │- Add/Edit   │      │- Marks      │
+│- Edit       │      │- View       │      │- Reports    │
+│- Delete     │      │- Delete     │      │- Charts     │
+│- Assign Roles│      │- Promote    │      └─────────────┘
+└─────────────┘      └─────────────┘              │
+        │                     │                   │
+        ▼                     ▼                   ▼
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│SCHOOL MGMT  │      │MARKS ENTRY  │      │CERTIFICATES │
+│- Add/Edit   │      │- Enter      │      │- View       │
+│- View       │      │- Edit       │      │- Download   │
+│- Reports    │      │- Approve    │      │- Share      │
+└─────────────┘      └─────────────┘      └─────────────┘
+        │                     │                   │
+        ▼                     ▼                   ▼
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│EXAM MGMT    │      │REPORTS      │      │NOTIFICATIONS│
+│- Schedule   │      │- Generate   │      │- SMS        │
+│- Create     │      │- View       │      │- Email      │
+│- Results    │      │- Export     │      │- App        │
+└─────────────┘      └─────────────┘      └─────────────┘
+        │                     │                   │
+        ▼                     ▼                   ▼
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│BILLING      │      │ANALYTICS    │      │COMMUNICATION│
+│- View       │      │- Dashboard  │      │- Messages   │
+│- Pay        │      │- Trends     │      │- Feedback   │
+│- History    │      │- Insights   │      └─────────────┘
+└─────────────┘      └─────────────┘              │
+        │                     │                   │
+        └─────────────────────┼───────────────────┘
+                              │
+                    ┌────────────────────┐
+                    │   DATABASE ACCESS  │
+                    │  (PostgreSQL/Prisma)│
+                    └────────────────────┘
+                              │
+                    ┌────────────────────┐
+                    │   LOGGING & AUDIT  │
+                    └────────────────────┘
+                              │
+                    ┌────────────────────┐
+                    │  ERROR HANDLING    │
+                    └────────────────────┘
+                              │
+                    ┌────────────────────┐
+                    │  RESPONSE TO USER  │
+                    └────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        DETAILED MARKS ENTRY FLOW                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+TEACHER ──► LOGIN ──► SELECT CLASS ──► SELECT SUBJECT ──► 
+ENTER MARKS ──► REVIEW ──► SUBMIT ──► 
+AUTO CALCULATE GRADES ──► GENERATE REPORT ──► 
+NOTIFY STUDENT/PARENT ──► STORE IN DATABASE
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        REPORT GENERATION FLOW                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+USER REQUEST ──► SELECT REPORT TYPE ──► 
+SELECT PARAMETERS ──► FETCH DATA ──► 
+PROCESS DATA ──► FORMAT REPORT ──► 
+EXPORT OPTIONS (PDF/EXCEL/CSV) ──► 
+DELIVER TO USER ──► LOG ACTIVITY
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        NOTIFICATION FLOW                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+EVENT TRIGGER ──► CREATE NOTIFICATION ──► 
+SELECT RECIPIENTS ──► FORMAT MESSAGE ──► 
+SEND VIA CHANNELS (SMS/EMAIL/APP) ──► 
+TRACK DELIVERY ──► STORE LOG
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        USER ACCESS LEVELS                                   │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+SUPER ADMIN:     FULL ACCESS TO ALL FEATURES
+DISTRICT ADMIN:  ACCESS TO MULTIPLE SCHOOLS IN DISTRICT
+SCHOOL ADMIN:    ACCESS TO SINGLE SCHOOL MANAGEMENT
+TEACHER:         ACCESS TO CLASS AND STUDENT DATA
+STUDENT:         ACCESS TO PERSONAL RESULTS AND REPORTS
+PARENT:          ACCESS TO CHILD'S RESULTS AND REPORTS

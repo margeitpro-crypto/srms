@@ -1,0 +1,67 @@
+SRMS (Student Result Management System) - Project Structure
+
+                    ┌─────────────────────────────────────┐
+                    │           SRMS PROJECT              │
+                    │        (Nepal School System)        │
+                    └─────────────────────────────────────┘
+                                      │
+                    ┌─────────────────┼─────────────────┐
+                    │                 │                 │
+              ┌──────────┐      ┌──────────┐      ┌──────────┐
+              │ FRONTEND │      │ BACKEND  │      │ DATABASE │
+              │ (React)  │      │ (Node.js)│      │ (PostgreSQL)│
+              └──────────┘      └──────────┘      └──────────┘
+                    │                 │                 │
+        ┌───────────┼───────────┐     │      ┌──────────┼──────────┐
+        │           │           │     │      │          │          │
+  ┌──────────┐ ┌──────────┐ ┌──────────┐   │    ┌──────────┐ ┌──────────┐
+  │  Pages   │ │Components│ │ Services │   │    │ Migrations│ │  Seeds   │
+  └──────────┘ └──────────┘ └──────────┘   │    └──────────┘ └──────────┘
+        │           │           │          │          │          │
+  ┌──────────┐ ┌──────────┐ ┌──────────┐  │   ┌──────────┐ ┌──────────┐
+  │Dashboard │ │  Layout  │ │ API Call │  │   │   SQL    │ │InitialData│
+  │  Marks   │ │  Header  │ │ Handlers │  │   │  Schema  │ │  Users   │
+  │ Reports  │ │ Sidebar  │ │  Auth    │  │   │  Tables  │ │  Schools │
+  │ Exams    │ │  Cards   │ │  CRUD    │  │   │Relations │ │Subjects  │
+  │Billing   │ │ Buttons  │ │  Utils   │  │   │ Indexes  │ │  etc.    │
+  └──────────┘ └──────────┘ └──────────┘  │   └──────────┘ └──────────┘
+                    │           │          │          │          │
+                    └───────────┼──────────┘          └──────────┼──────────┐
+                                │                                │          │
+                        ┌─────────────────┐              ┌────────────┐ ┌────────────┐
+                        │   CONTROLLERS   │              │ PRISMA ORM │ │    CLI     │
+                        │  (Express.js)   │              │   Schema   │ │Deployment  │
+                        └─────────────────┘              │ Migrations │ │  Scripts   │
+                                │                        └────────────┘ └────────────┘
+                    ┌───────────┼───────────┐                     │          │
+                    │           │           │                     │          │
+              ┌──────────┐ ┌──────────┐ ┌──────────┐        ┌──────────┐ ┌──────────┐
+              │ AuthCtrl │ │UserCtrl  │ │MarkCtrl  │        │ Schema   │ │Docker    │
+              │ExamCtrl  │ │RepCtrl   │ │BillCtrl  │        │  Models  │ │Compose   │
+              │CertCtrl  │ │StudCtrl  │ │NotifCtrl │        │Relations │ │Nginx     │
+              └──────────┘ └──────────┘ └──────────┘        └──────────┘ └──────────┘
+                    │           │           │                     │          │
+                    └───────────┼───────────┘                     └──────────┼──────────┐
+                                │                                            │          │
+                        ┌─────────────────┐                        ┌────────────┐ ┌────────────┐
+                        │   MIDDLEWARE    │                        │  TESTING   │ │ DEPLOYMENT │
+                        │   & UTILS       │                        │   (Jest)   │ │  (Docker)  │
+                        └─────────────────┘                        └────────────┘ └────────────┘
+                                │                                            │          │
+                        ┌─────────────────┐                        ┌────────────┐ ┌────────────┐
+                        │  Auth Guards    │                        │ Unit Tests │ │Production  │
+                        │  Validation     │                        │Integ. Tests│ │  Server    │
+                        │  Error Handling │                        │  Coverage  │ │Monitoring  │
+                        │  Logging        │                        │  Reports   │ │CI/CD       │
+                        └─────────────────┘                        └────────────┘ └────────────┘
+
+Key Features:
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ USER ROLES: Super Admin, District Admin, School Admin, Teacher, Student, Parent│
+│ FUNCTIONALITY: Marks Entry, Reports, Certificates, Billing, Notifications   │
+│ SECURITY: JWT Authentication, Encrypted Data, Audit Logs                    │
+│ TECHNOLOGY: React + Node.js + PostgreSQL + Docker                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+

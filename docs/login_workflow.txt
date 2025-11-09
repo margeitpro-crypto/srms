@@ -1,0 +1,199 @@
+SRMS LOGIN SYSTEM WORKFLOW
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           LOGIN PROCESS FLOW                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+                    ┌────────────────────┐
+                    │   USER ACCESS      │
+                    │   LOGIN PAGE       │
+                    └────────────────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │  INPUT CREDENTIALS │
+                    │  - USERNAME/EMAIL  │
+                    │  - PASSWORD        │
+                    └────────────────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │   CLIENT-SIDE      │
+                    │   VALIDATION       │
+                    └────────────────────┘
+                              │
+                    ┌────────────────────┐
+                    │   REQUIRED FIELDS  │
+                    │   FORMAT CHECK     │
+                    │   LENGTH VALIDATION│
+                    └────────────────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │   SUBMIT REQUEST   │
+                    │   (HTTP POST)      │
+                    └────────────────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │   SERVER-SIDE      │
+                    │   VALIDATION       │
+                    └────────────────────┘
+                              │
+                    ┌────────────────────┐
+                    │  - CHECK USER      │
+                    │    EXISTS          │
+                    │  - VERIFY PASSWORD │
+                    │  - CHECK STATUS    │
+                    └────────────────────┘
+                              │
+                              ▼
+                    ┌────────────────────┐
+                    │   AUTHENTICATION   │
+                    │   PROCESS          │
+                    └────────────────────┘
+                              │
+                    ┌────────────────────┐
+                    │  - HASH PASSWORD   │
+                    │  - COMPARE HASHES  │
+                    │  - CHECK EXPIRY    │
+                    └────────────────────┘
+                              │
+               ┌──────────────┼──────────────┐
+               │              │              │
+               ▼              ▼              ▼
+        ┌──────────┐   ┌──────────┐   ┌──────────┐
+        │ SUCCESS  │   │ FAILURE  │   │  ERROR   │
+        └──────────┘   └──────────┘   └──────────┘
+               │              │              │
+               ▼              │              ▼
+    ┌────────────────────┐    │   ┌────────────────────┐
+    │ GENERATE JWT TOKEN │    │   │  RETURN ERROR      │
+    └────────────────────┘    │   │  MESSAGE           │
+               │              │   │  - INVALID CRED    │
+               ▼              │   │  - ACCOUNT LOCKED  │
+    ┌────────────────────┐    │   │  - SERVER ERROR    │
+    │ STORE USER SESSION │    │   └────────────────────┘
+    │ - TOKEN IN COOKIE  │    │              │
+    │ - SESSION DATA     │    │              │
+    └────────────────────┘    │              │
+               │              │              │
+               ▼              │              │
+    ┌────────────────────┐    │              │
+    │ SET AUTH HEADERS   │    │              │
+    └────────────────────┘    │              │
+               │              │              │
+               ▼              │              │
+    ┌────────────────────┐    │              │
+    │ REDIRECT TO        │    │              │
+    │ DASHBOARD          │    │              │
+    └────────────────────┘    │              │
+               │              │              │
+               ▼              ▼              ▼
+    ┌─────────────────────────────────────────────┐
+    │            USER DASHBOARD                   │
+    │  - ROLE-BASED CONTENT                       │
+    │  - PERSONALIZED VIEW                        │
+    │  - ACCESS PERMISSIONS                       │
+    └─────────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        TOKEN MANAGEMENT FLOW                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+        JWT TOKEN CREATION:
+        ┌─────────────────────────────────────────┐
+        │ 1. USER LOGIN SUCCESS                   │
+        │ 2. GENERATE PAYLOAD                     │
+        │    - USER ID                            │
+        │    - USERNAME                           │
+        │    - ROLE                               │
+        │    - PERMISSIONS                        │
+        │    - TIMESTAMP                          │
+        │ 3. SIGN WITH SECRET KEY                 │
+        │ 4. SET EXPIRATION (24 HOURS)            │
+        │ 5. RETURN TOKEN TO CLIENT               │
+        └─────────────────────────────────────────┘
+
+        TOKEN VALIDATION:
+        ┌─────────────────────────────────────────┐
+        │ 1. INTERCEPT REQUEST                    │
+        │ 2. EXTRACT TOKEN FROM HEADER/COOKIE     │
+        │ 3. VERIFY SIGNATURE                     │
+        │ 4. CHECK EXPIRATION                     │
+        │ 5. DECODE PAYLOAD                       │
+        │ 6. ATTACH USER DATA TO REQUEST          │
+        │ 7. ALLOW/DENY ACCESS                    │
+        └─────────────────────────────────────────┘
+
+        TOKEN REFRESH:
+        ┌─────────────────────────────────────────┐
+        │ 1. CHECK TOKEN EXPIRATION               │
+        │ 2. VALIDATE CURRENT TOKEN               │
+        │ 3. GENERATE NEW TOKEN                   │
+        │ 4. UPDATE CLIENT                        │
+        │ 5. INVALIDATE OLD TOKEN                 │
+        └─────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        SECURITY MEASURES                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    PASSWORD SECURITY:
+    ┌─────────────────────────────────────────┐
+    │ • BCRYPT HASHING (12 ROUNDS)            │
+    │ • SALT GENERATION PER PASSWORD          │
+    │ • PASSWORD COMPLEXITY REQUIREMENTS      │
+    │ • RATE LIMITING ON LOGIN ATTEMPTS       │
+    │ • ACCOUNT LOCKOUT AFTER 5 FAILURES      │
+    │ • CAPTCHA AFTER 3 FAILED ATTEMPTS       │
+    └─────────────────────────────────────────┘
+
+    SESSION SECURITY:
+    ┌─────────────────────────────────────────┐
+    │ • SECURE HTTPONLY COOKIES               │
+    │ • SAME-SITE COOKIE POLICY               │
+    │ • TOKEN BLACKLISTING                    │
+    │ • CONCURRENT SESSION LIMITS             │
+    │ • IP ADDRESS MONITORING                 │
+    │ • DEVICE FINGERPRINTING                 │
+    └─────────────────────────────────────────┘
+
+    TRANSPORT SECURITY:
+    ┌─────────────────────────────────────────┐
+    │ • HTTPS ENFORCEMENT                     │
+    │ • HSTS HEADER IMPLEMENTATION            │
+    │ • CORS POLICY CONFIGURATION             │
+    │ • CONTENT SECURITY POLICY               │
+    │ • X-FRAME-OPTIONS HEADER                │
+    └─────────────────────────────────────────┘
+
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        ERROR HANDLING                                       │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+    COMMON LOGIN ERRORS:
+    ┌─────────────────────────────────────────┐
+    │ STATUS 400:                             │
+    │ • MISSING CREDENTIALS                   │
+    │ • INVALID INPUT FORMAT                  │
+    │                                         │
+    │ STATUS 401:                             │
+    │ • INVALID USERNAME/PASSWORD             │
+    │ • ACCOUNT NOT VERIFIED                  │
+    │                                         │
+    │ STATUS 403:                             │
+    │ • ACCOUNT SUSPENDED                     │
+    │ • ACCESS DENIED                         │
+    │                                         │
+    │ STATUS 429:                             │
+    │ • TOO MANY REQUESTS                     │
+    │ • RATE LIMIT EXCEEDED                   │
+    │                                         │
+    │ STATUS 500:                             │
+    │ • SERVER ERROR                          │
+    │ • DATABASE CONNECTION FAILED            │
+    └─────────────────────────────────────────┘

@@ -1,0 +1,103 @@
+{
+  "name": "School Result Management System",
+  "short_name": "SRMS",
+  "description": "Nepal National School Result Management System",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "screenshots": [
+    {
+      "src": "/screenshot-desktop.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "SRMS Dashboard on Desktop"
+    },
+    {
+      "src": "/screenshot-mobile.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "SRMS Dashboard on Mobile"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "Access your dashboard",
+      "icons": [{ "src": "/dashboard-icon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Students",
+      "url": "/students",
+      "description": "Manage students",
+      "icons": [{ "src": "/students-icon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Exams",
+      "url": "/exams",
+      "description": "Manage exams",
+      "icons": [{ "src": "/exams-icon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Reports",
+      "url": "/reports",
+      "description": "View reports",
+      "icons": [{ "src": "/reports-icon.png", "sizes": "96x96" }]
+    }
+  ]
+}
